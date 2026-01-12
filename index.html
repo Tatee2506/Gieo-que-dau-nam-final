@@ -1,0 +1,862 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gieo Quẻ Đầu Năm – Equality Club</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --orange: #ff8c2b;
+      --orange-light: #ffe2c7;
+      --bg: #fff7ef;
+      --text: #333;
+    }
+
+    * {
+      box-sizing: border-box;
+      font-family: 'Inter', sans-serif;
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      background: linear-gradient(180deg, #fff, var(--bg));
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 420px;
+      padding: 20px;
+      position: relative;
+    }
+
+    .card {
+      background: #fff;
+      border-radius: 20px;
+      padding: 24px 20px 28px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card::before {
+      content: "";
+      position: absolute;
+      top: -60px;
+      right: -60px;
+      width: 160px;
+      height: 160px;
+      background: radial-gradient(circle, var(--orange-light), transparent 70%);
+    }
+
+    .card::after {
+      content: "";
+      position: absolute;
+      bottom: -60px;
+      left: -60px;
+      width: 160px;
+      height: 160px;
+      background: radial-gradient(circle, var(--orange-light), transparent 70%);
+    }
+
+    h1 {
+      font-family: 'Playfair Display', serif;
+      color: var(--orange);
+      font-size: 1.8rem;
+      margin-bottom: 4px;
+    }
+
+    .subtitle {
+      font-size: 0.9rem;
+      opacity: 0.7;
+      margin-bottom: 20px;
+    }
+
+    .input-group {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    input {
+      flex: 1;
+      padding: 12px 14px;
+      border-radius: 12px;
+      border: 1.5px solid #eee;
+      font-size: 1rem;
+      outline: none;
+    }
+
+    input:focus {
+      border-color: var(--orange);
+    }
+
+    button {
+      background: var(--orange);
+      color: white;
+      border: none;
+      padding: 12px 16px;
+      border-radius: 12px;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: 0.2s ease;
+    }
+
+    button:hover {
+      transform: scale(1.03);
+    }
+
+    .result {
+      margin-top: 20px;
+      padding: 18px;
+      border-radius: 14px;
+      background: linear-gradient(180deg, #fffaf4, #fff);
+      border: 1px solid #f3e1ce;
+      animation: fadeIn 0.4s ease;
+    }
+
+    .topic {
+      color: var(--orange);
+      font-weight: 600;
+      margin-bottom: 6px;
+    }
+
+    .poem {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.05rem;
+      margin-bottom: 10px;
+      white-space: pre-line;
+    }
+
+    .meaning {
+      font-size: 0.95rem;
+      line-height: 1.5;
+      opacity: 0.85;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .footer {
+      margin-top: 14px;
+      font-size: 0.75rem;
+      opacity: 0.5;
+    }
+
+    /* Decorative floating shapes */
+    .decor {
+      position: absolute;
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      background: radial-gradient(circle, var(--orange-light), transparent 70%);
+      z-index: 0;
+      animation: float 6s ease-in-out infinite;
+    }
+
+    .decor.one { top: -20px; left: -20px; }
+    .decor.two { bottom: -20px; right: -20px; animation-delay: 2s; }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="decor one"></div>
+    <div class="decor two"></div>
+
+    <div class="card">
+      <h1>Gieo Quẻ Đầu Năm</h1>
+      <div class="subtitle">Equality Club</div>
+
+      <div class="input-group">
+        <input type="number" id="numberInput" placeholder="Nhập số từ 1 đến 50" min="1" max="50">
+        <button onclick="drawFortune()">Gieo quẻ</button>
+      </div>
+
+      <div id="result"></div>
+
+      <div class="footer">© Equality Club</div>
+    </div>
+  </div>
+
+  <script>
+    const fortunes = {
+      // 1: [
+  {
+    topic: "Sức khỏe",
+    poem: "Gió xuân khẽ chạm hiên nhà,\nThân tâm nhẹ bước, an hòa sớm mai.",
+    meaning: "Năm nay sức khỏe của bạn thiên về sự ổn định. Nếu biết lắng nghe cơ thể, ngủ đủ và vận động nhẹ nhàng, bạn sẽ cảm thấy tinh thần lẫn thể chất đều dễ chịu hơn."
+  },
+  {
+    topic: "Sức khỏe",
+    poem: "Một tách trà ấm trong tay,\nMệt mỏi khẽ rơi theo làn gió chiều.",
+    meaning: "Bạn đang trong giai đoạn cần nghỉ ngơi và hồi phục năng lượng. Đừng ép bản thân quá sức, chậm lại một chút sẽ giúp bạn bền bỉ hơn về lâu dài."
+  }
+],
+
+2: [
+  {
+    topic: "Học vấn",
+    poem: "Trang sách mở giữa mùa xuân,\nÝ tưởng nảy lộc, ước mơ lên mầm.",
+    meaning: "Năm nay bạn có nhiều cơ hội học hỏi và phát triển. Nếu chủ động tìm tòi, bạn sẽ nhận ra khả năng của mình nhiều hơn bạn tưởng."
+  },
+  {
+    topic: "Học vấn",
+    poem: "Bước chậm chẳng sợ đường xa,\nChỉ cần bền bỉ, nắng hoa sẽ về.",
+    meaning: "Bạn không cần phải giỏi ngay từ đầu. Quan trọng là bạn kiên trì và không bỏ cuộc giữa chừng."
+  }
+],
+
+3: [
+  {
+    topic: "Tình duyên",
+    poem: "Xuân sang gió cũng dịu dàng,\nMột người mỉm cười, tim bỗng an yên.",
+    meaning: "Năm nay tình cảm của bạn có xu hướng nhẹ nhàng, không ồn ào nhưng sâu sắc. Hãy mở lòng, những điều đẹp đẽ sẽ đến."
+  },
+  {
+    topic: "Tình duyên",
+    poem: "Chẳng cần hứa hẹn xa xôi,\nChỉ mong hôm ấy, cạnh tôi là người.",
+    meaning: "Bạn sẽ nhận ra rằng tình cảm không cần quá phô trương. Sự chân thành và quan tâm nhỏ nhặt mới là điều quan trọng nhất."
+  }
+],
+4: [
+  {
+    topic: "Gia đình",
+    poem: "Nhà là nơi gió dừng chân,\nMệt bao nhiêu cũng hóa thành an yên.",
+    meaning: "Năm nay, gia đình sẽ là nguồn động viên lớn với bạn. Dù ngoài kia có áp lực thế nào, về nhà vẫn là nơi giúp bạn nạp lại năng lượng."
+  },
+  {
+    topic: "Gia đình",
+    poem: "Một bữa cơm, một nụ cười,\nĐủ làm ấm cả khoảng trời tháng năm.",
+    meaning: "Bạn sẽ nhận ra hạnh phúc không đến từ điều to tát, mà từ những khoảnh khắc rất nhỏ bên người thân."
+  }
+],
+
+5: [
+  {
+    topic: "Tiền tài",
+    poem: "Gió xuân mang lộc ghé thềm,\nChăm chỉ hôm nay, ngày mai đủ đầy.",
+    meaning: "Tài chính của bạn năm nay có chiều hướng ổn định. Nếu biết quản lý chi tiêu hợp lý, bạn sẽ không còn lo lắng quá nhiều."
+  },
+  {
+    topic: "Tiền tài",
+    poem: "Một đồng gom lại thành kho,\nChậm mà chắc, chẳng lo đường dài.",
+    meaning: "Bạn không cần kiếm thật nhiều tiền ngay lập tức. Quan trọng là học cách tích lũy và chi tiêu thông minh."
+  }
+],
+
+6: [
+  {
+    topic: "Công việc",
+    poem: "Đường xa bắt đầu từ bước,\nĐi đều, rồi cũng đến nơi.",
+    meaning: "Năm nay bạn có thể chưa thấy kết quả ngay, nhưng từng nỗ lực nhỏ đều đang xây nền cho thành công sau này."
+  },
+  {
+    topic: "Công việc",
+    poem: "Một lần thử, một lần tin,\nCửa mới sẽ mở khi mình dám đi.",
+    meaning: "Bạn sẽ có cơ hội mới trong công việc hoặc học tập. Đừng ngại thử sức, vì đó là cách bạn trưởng thành."
+  }
+],
+7: [
+  {
+    topic: "Sức khỏe",
+    poem: "Sớm mai hít thở nhẹ nhàng,\nThân tâm tỉnh giấc, bình an theo về.",
+    meaning: "Năm nay bạn cần chú ý đến việc giữ nhịp sinh hoạt đều đặn. Chỉ cần ngủ đủ và ăn uống lành mạnh, cơ thể bạn sẽ khỏe lên rõ rệt."
+  },
+  {
+    topic: "Sức khỏe",
+    poem: "Chậm thôi giữa những vội vàng,\nMột ly nước ấm cũng thành yêu thương.",
+    meaning: "Bạn thường quên chăm sóc bản thân vì quá bận rộn. Hãy nhớ rằng nghỉ ngơi cũng là một phần của thành công."
+  }
+],
+
+8: [
+  {
+    topic: "Học vấn",
+    poem: "Gió xuân lay cửa tri thức,\nMột trang sách mở, vạn điều mới sinh.",
+    meaning: "Năm nay bạn sẽ gặp những điều mới mẻ trong học tập. Nếu chịu khó tìm tòi, bạn sẽ học được nhiều hơn mong đợi."
+  },
+  {
+    topic: "Học vấn",
+    poem: "Mỗi ngày thêm một chút,\nTri thức gom lại thành xa.",
+    meaning: "Đừng so sánh bản thân với người khác. Bạn đang tiến bộ theo nhịp riêng của mình, và điều đó là đủ."
+  }
+],
+
+9: [
+  {
+    topic: "Tình duyên",
+    poem: "Một ánh nhìn, một nụ cười,\nTim bỗng lặng gió giữa đời lao xao.",
+    meaning: "Bạn có thể gặp một người khiến bạn cảm thấy rất dễ chịu khi ở bên. Đó có thể là khởi đầu của điều gì đó đẹp."
+  },
+  {
+    topic: "Tình duyên",
+    poem: "Chẳng cần hứa hẹn xa xôi,\nChỉ mong hôm ấy, lòng không cô đơn.",
+    meaning: "Năm nay, bạn học được cách trân trọng những người thật lòng với mình, thay vì chạy theo những điều mơ hồ."
+  }
+],
+10: [
+  {
+    topic: "Gia đình",
+    poem: "Bếp hồng, ấm một góc nhà,\nTiếng quen gọi khẽ, lòng ta dịu mềm.",
+    meaning: "Năm nay, gia đình sẽ là chỗ dựa tinh thần lớn của bạn. Những lúc mệt mỏi, chỉ cần trở về và trò chuyện, bạn sẽ thấy nhẹ lòng hơn nhiều."
+  },
+  {
+    topic: "Gia đình",
+    poem: "Một lời hỏi, một câu thăm,\nĐủ làm ấm cả tháng năm nhọc nhằn.",
+    meaning: "Bạn sẽ nhận ra rằng sự quan tâm không cần quá phô trương. Chỉ cần ở bên nhau, mọi thứ đã trở nên ý nghĩa."
+  }
+],
+11: [
+  {
+    topic: "Tiền tài",
+    poem: "Gió xuân ghé cửa hiên nhà,\nTừng đồng gom góp nở hoa đủ đầy.",
+    meaning: "Năm nay tài chính của bạn không bùng nổ, nhưng ổn định. Nếu chi tiêu hợp lý và tiết kiệm, bạn sẽ thấy an tâm hơn rất nhiều."
+  },
+  {
+    topic: "Tiền tài",
+    poem: "Chậm mà chắc, chẳng lo xa,\nTích từng chút nhỏ, mai lành hơn nay.",
+    meaning: "Bạn đang học cách quản lý tiền bạc tốt hơn. Đây là nền tảng quan trọng cho sự tự lập sau này."
+  }
+],
+
+12: [
+  {
+    topic: "Công việc",
+    poem: "Đường dài mở giữa bình minh,\nMỗi ngày cố gắng, chính mình đổi thay.",
+    meaning: "Năm nay bạn sẽ có nhiều cơ hội để thử sức. Đừng ngại bắt đầu từ những việc nhỏ, vì đó là cách bạn tích lũy kinh nghiệm."
+  },
+  {
+    topic: "Công việc",
+    poem: "Chưa giỏi cũng chẳng sao đâu,\nChỉ cần bền bỉ, ngày sau sẽ thành.",
+    meaning: "Bạn có thể cảm thấy mình chưa đủ tốt, nhưng đừng tự ti. Ai cũng có một quá trình để trưởng thành."
+  }
+],
+
+13: [
+  {
+    topic: "Sức khỏe",
+    poem: "Nắng mai hong ấm vai gầy,\nHơi thở nhẹ lại, mỏi mệt rơi dần.",
+    meaning: "Năm nay, sức khỏe của bạn cải thiện dần nếu bạn biết nghỉ ngơi đúng cách. Đừng thức khuya quá nhiều nhé."
+  },
+  {
+    topic: "Sức khỏe",
+    poem: "Một ngày chậm, một ngày yên,\nThân tâm thư thả, ưu phiền lặng trôi.",
+    meaning: "Bạn cần học cách sống chậm lại. Khi tinh thần ổn định, cơ thể bạn cũng sẽ khỏe hơn."
+  }
+],
+14: [
+  {
+    topic: "Học vấn",
+    poem: "Mỗi trang sách, một bầu trời,\nMở ra tri thức, gọi mời ước mơ.",
+    meaning: "Năm nay bạn có nhiều cơ hội để học thêm những điều mới. Đừng ngại thử sức với những lĩnh vực bạn chưa từng nghĩ tới."
+  },
+  {
+    topic: "Học vấn",
+    poem: "Chậm thôi, đừng quá vội,\nĐi đều rồi cũng tới xa.",
+    meaning: "Bạn không cần phải chạy đua với ai cả. Học theo nhịp của mình, bạn sẽ cảm thấy nhẹ nhàng hơn."
+  }
+],
+
+15: [
+  {
+    topic: "Tình duyên",
+    poem: "Giữa muôn người, một ánh nhìn,\nTự nhiên tim thấy bình yên lạ kỳ.",
+    meaning: "Năm nay, bạn có thể gặp một người khiến bạn cảm thấy thoải mái khi ở bên. Đó là dấu hiệu tốt cho một mối quan hệ lành mạnh."
+  },
+  {
+    topic: "Tình duyên",
+    poem: "Không cần quá nhiều lời,\nChỉ cần thật lòng là đủ.",
+    meaning: "Bạn sẽ nhận ra rằng sự chân thành quan trọng hơn mọi lời hứa hẹn."
+  }
+],
+
+16: [
+  {
+    topic: "Gia đình",
+    poem: "Mái hiên che gió che mưa,\nNhà là nơi đón những mùa bình yên.",
+    meaning: "Gia đình vẫn luôn là nơi để bạn quay về mỗi khi mệt mỏi. Đừng quên dành thời gian cho những người thân yêu."
+  },
+  {
+    topic: "Gia đình",
+    poem: "Một câu hỏi nhỏ thôi,\nCũng đủ làm ấm lòng nhau.",
+    meaning: "Sự quan tâm không cần quá lớn lao. Đôi khi chỉ cần hỏi han cũng khiến người khác cảm thấy được yêu thương."
+  }
+],
+17: [
+  {
+    topic: "Tiền tài",
+    poem: "Một đồng nhỏ, một niềm tin,\nGom thành vững bước, bình minh phía trước.",
+    meaning: "Năm nay tài chính của bạn tăng trưởng từ từ. Đừng coi thường những khoản nhỏ, vì chính chúng tạo nên sự ổn định lâu dài."
+  },
+  {
+    topic: "Tiền tài",
+    poem: "Chậm mà đều, chẳng lo xa,\nBiết tính hôm nay, đủ đầy ngày mai.",
+    meaning: "Bạn đang học cách chi tiêu có kế hoạch. Điều này sẽ giúp bạn bớt áp lực về tiền bạc hơn."
+  }
+],
+
+18: [
+  {
+    topic: "Công việc",
+    poem: "Một bước thử, một lần tin,\nĐường mới mở giữa bình minh đời mình.",
+    meaning: "Năm nay bạn sẽ có cơ hội mới trong học tập hoặc công việc. Hãy dũng cảm thử, bạn sẽ học được nhiều hơn bạn nghĩ."
+  },
+  {
+    topic: "Công việc",
+    poem: "Không cần giỏi ngay đâu,\nChỉ cần cố gắng từng ngày.",
+    meaning: "Đừng tự so sánh mình với người khác. Mỗi người có một hành trình riêng để trưởng thành."
+  }
+],
+
+19: [
+  {
+    topic: "Sức khỏe",
+    poem: "Sáng lên hít gió đầu ngày,\nThân tâm tỉnh táo, lòng này an nhiên.",
+    meaning: "Năm nay bạn cần chú ý giữ thói quen sinh hoạt đều đặn. Chỉ cần ngủ đủ và ăn uống lành mạnh, bạn sẽ thấy khác biệt."
+  },
+  {
+    topic: "Sức khỏe",
+    poem: "Một ngày nhẹ, một ngày yên,\nBình an gom lại thành miền yêu thương.",
+    meaning: "Bạn đang học cách yêu bản thân hơn. Khi tinh thần tốt, sức khỏe cũng sẽ cải thiện."
+  }
+],
+20: [
+  {
+    topic: "Học vấn",
+    poem: "Trang vở mới, mực còn thơm,\nMột năm cố gắng, ước mơ dần gần.",
+    meaning: "Năm nay là thời điểm tốt để bạn đặt mục tiêu học tập rõ ràng hơn. Nếu kiên trì, bạn sẽ thấy kết quả khiến chính mình bất ngờ."
+  },
+  {
+    topic: "Học vấn",
+    poem: "Chẳng cần phải giỏi ngay,\nChỉ cần mỗi ngày tốt hơn hôm qua.",
+    meaning: "Bạn đang tiến bộ từng chút một. Đừng coi thường những bước nhỏ, vì chính chúng tạo nên thành công lớn."
+  }
+],
+21: [
+  {
+    topic: "Tình duyên",
+    poem: "Giữa muôn lối rẽ cuộc đời,\nCó người bước đến, nhẹ lời an yên.",
+    meaning: "Năm nay bạn có thể gặp người khiến bạn cảm thấy an toàn khi là chính mình."
+  },
+  {
+    topic: "Tình duyên",
+    poem: "Không cần hứa mãi về sau,\nChỉ cần hiện tại bên nhau thật lòng.",
+    meaning: "Bạn học được cách trân trọng những khoảnh khắc nhỏ trong tình cảm."
+  }
+],
+
+22: [
+  {
+    topic: "Gia đình",
+    poem: "Nhà là nơi chẳng cần son phấn,\nVề rồi, mệt mỏi cũng tan nhanh.",
+    meaning: "Gia đình là chỗ dựa tinh thần lớn nhất của bạn trong năm nay."
+  },
+  {
+    topic: "Gia đình",
+    poem: "Một bữa cơm, một tiếng cười,\nĐủ cho lòng thấy yên vui cả ngày.",
+    meaning: "Dành thời gian cho người thân sẽ giúp bạn nạp lại năng lượng."
+  }
+],
+
+23: [
+  {
+    topic: "Tiền tài",
+    poem: "Gom từng chút, đủ thành nhiều,\nChậm mà chắc, chẳng lo thiếu sau này.",
+    meaning: "Tài chính của bạn năm nay ổn định nếu bạn biết kiểm soát chi tiêu."
+  },
+  {
+    topic: "Tiền tài",
+    poem: "Biết giữ mới có để dành,\nTiền không chỉ kiếm, mà cần hiểu dùng.",
+    meaning: "Bạn đang học cách quản lý tiền bạc thông minh hơn."
+  }
+],
+
+24: [
+  {
+    topic: "Công việc",
+    poem: "Chẳng cần phải giỏi nhất đâu,\nChỉ cần bền bỉ đến cùng là hơn.",
+    meaning: "Năm nay bạn sẽ tiến bộ nhờ sự kiên trì, không phải vì tốc độ."
+  },
+  {
+    topic: "Công việc",
+    poem: "Mỗi ngày một bước nhỏ,\nRồi cũng tới đích xa.",
+    meaning: "Đừng nản khi chưa thấy kết quả ngay."
+  }
+],
+
+25: [
+  {
+    topic: "Sức khỏe",
+    poem: "Thở sâu một chút cho lòng,\nBao nhiêu mệt mỏi cũng vơi dần ra.",
+    meaning: "Bạn cần chú ý nghỉ ngơi và cân bằng tinh thần."
+  },
+  {
+    topic: "Sức khỏe",
+    poem: "Ngủ đủ, ăn lành, cười tươi,\nBa điều nhỏ, giữ đời bình an.",
+    meaning: "Những thói quen nhỏ sẽ giúp sức khỏe bạn tốt hơn."
+  }
+],
+
+26: [
+  {
+    topic: "Học vấn",
+    poem: "Mỗi lần sai là một lần khôn,\nKhông ai giỏi sẵn từ hôm ban đầu.",
+    meaning: "Bạn đang học rất nhiều từ chính những lỗi sai."
+  },
+  {
+    topic: "Học vấn",
+    poem: "Chậm thôi nhưng chắc từng ngày,\nTri thức gom lại thành mây vững vàng.",
+    meaning: "Đừng áp lực, bạn đang đi đúng hướng."
+  }
+],
+
+27: [
+  {
+    topic: "Tình duyên",
+    poem: "Có người đến để ở lại,\nCó người đến để dạy ta trưởng thành.",
+    meaning: "Dù kết quả thế nào, mỗi mối quan hệ đều có ý nghĩa."
+  },
+  {
+    topic: "Tình duyên",
+    poem: "Không phải ai cũng đi cùng ta mãi,\nNhưng ai cũng từng làm ta vui.",
+    meaning: "Học cách trân trọng, không níu kéo."
+  }
+],
+
+28: [
+  {
+    topic: "Gia đình",
+    poem: "Dù đi xa đến đâu,\nNhà vẫn là nơi chờ.",
+    meaning: "Gia đình luôn ở phía sau ủng hộ bạn."
+  },
+  {
+    topic: "Gia đình",
+    poem: "Không cần nói quá nhiều,\nChỉ cần hiểu nhau là đủ.",
+    meaning: "Sự thấu hiểu quan trọng hơn lời nói."
+  }
+],
+
+29: [
+  {
+    topic: "Tiền tài",
+    poem: "Tiền không mua được hết,\nNhưng giúp đời nhẹ hơn.",
+    meaning: "Bạn sẽ có cái nhìn chín chắn hơn về giá trị đồng tiền."
+  },
+  {
+    topic: "Tiền tài",
+    poem: "Biết đủ là giàu,\nBiết vui là phước.",
+    meaning: "Bạn học được cách hài lòng với những gì mình có."
+  }
+],
+
+30: [
+  {
+    topic: "Công việc",
+    poem: "Một năm, một bước ngoặt,\nDám thử là đã thắng rồi.",
+    meaning: "Bạn sắp có cơ hội mới, đừng ngại thay đổi."
+  },
+  {
+    topic: "Công việc",
+    poem: "Không cần hoàn hảo,\nChỉ cần không bỏ cuộc.",
+    meaning: "Bền bỉ sẽ giúp bạn đi xa."
+  }
+],
+31: [
+  {
+    topic: "Sức khỏe",
+    poem: "Mỗi sáng thức dậy bình yên,\nLà một món quà rất hiền của đời.",
+    meaning: "Bạn nên trân trọng cơ thể mình hơn. Nghỉ ngơi đúng lúc sẽ giúp bạn đi xa."
+  },
+  {
+    topic: "Sức khỏe",
+    poem: "Nghe tim đập, nghe mình thở,\nĐời vẫn còn nhiều điều đáng thương.",
+    meaning: "Tinh thần bạn đang dần ổn định, đừng tự ép bản thân quá."
+  }
+],
+
+32: [
+  {
+    topic: "Học vấn",
+    poem: "Chữ nhỏ góp thành tri thức lớn,\nNgày qua ngày, mộng cũng gần.",
+    meaning: "Bạn đang tích lũy kiến thức từng chút một, đừng nản."
+  },
+  {
+    topic: "Học vấn",
+    poem: "Không cần nhanh hơn ai,\nChỉ cần không dừng lại.",
+    meaning: "Bạn có tốc độ riêng của mình, và nó hoàn toàn ổn."
+  }
+],
+
+33: [
+  {
+    topic: "Tình duyên",
+    poem: "Có người khiến tim nhẹ lại,\nChỉ bằng một câu quan tâm.",
+    meaning: "Bạn sẽ cảm nhận được sự ấm áp từ ai đó trong năm nay."
+  },
+  {
+    topic: "Tình duyên",
+    poem: "Yêu không cần ồn ào,\nChỉ cần thật.",
+    meaning: "Sự chân thành sẽ giúp mối quan hệ của bạn bền lâu."
+  }
+],
+
+34: [
+  {
+    topic: "Gia đình",
+    poem: "Bữa cơm đơn giản thôi,\nMà ấm lòng đến lạ.",
+    meaning: "Những khoảnh khắc nhỏ với gia đình sẽ khiến bạn hạnh phúc."
+  },
+  {
+    topic: "Gia đình",
+    poem: "Có nhau là đủ,\nChẳng cần thêm gì.",
+    meaning: "Gia đình là nơi không cần phải cố gắng để được yêu."
+  }
+],
+
+35: [
+  {
+    topic: "Tiền tài",
+    poem: "Gom từng đồng nhỏ,\nMai này thành an yên.",
+    meaning: "Bạn đang xây nền tảng tài chính bền vững."
+  },
+  {
+    topic: "Tiền tài",
+    poem: "Tiêu ít, nghĩ nhiều,\nLà khôn ngoan.",
+    meaning: "Bạn đang học cách chi tiêu thông minh hơn."
+  }
+],
+
+36: [
+  {
+    topic: "Công việc",
+    poem: "Một ngày cố gắng,\nLà một bước gần mơ.",
+    meaning: "Công việc của bạn sẽ tiến triển nếu bạn kiên trì."
+  },
+  {
+    topic: "Công việc",
+    poem: "Không ai giỏi ngay từ đầu,\nChỉ có ai đi tới cuối.",
+    meaning: "Đừng bỏ cuộc sớm."
+  }
+],
+
+37: [
+  {
+    topic: "Sức khỏe",
+    poem: "Ăn một bữa tử tế,\nNgủ một giấc an lành.",
+    meaning: "Chăm sóc bản thân từ những điều đơn giản."
+  },
+  {
+    topic: "Sức khỏe",
+    poem: "Lòng yên thì thân cũng yên.",
+    meaning: "Tinh thần ổn định sẽ giúp bạn khỏe hơn."
+  }
+],
+
+38: [
+  {
+    topic: "Học vấn",
+    poem: "Mỗi lần ngã,\nLà một lần hiểu hơn.",
+    meaning: "Sai không xấu, bỏ cuộc mới đáng tiếc."
+  },
+  {
+    topic: "Học vấn",
+    poem: "Biết mình chưa giỏi,\nLà bước đầu của giỏi.",
+    meaning: "Bạn đang trưởng thành trong tư duy."
+  }
+],
+
+39: [
+  {
+    topic: "Tình duyên",
+    poem: "Có người đến chậm,\nNhưng ở lại lâu.",
+    meaning: "Một mối quan hệ bền vững đang dần hình thành."
+  },
+  {
+    topic: "Tình duyên",
+    poem: "Thương là không ép,\nYêu là không gồng.",
+    meaning: "Bạn sẽ học cách yêu lành mạnh hơn."
+  }
+],
+
+40: [
+  {
+    topic: "Gia đình",
+    poem: "Đi xa mấy cũng nhớ nhà,\nNhớ mùi cơm, nhớ tiếng cười.",
+    meaning: "Gia đình là nơi bạn luôn thuộc về."
+  },
+  {
+    topic: "Gia đình",
+    poem: "Không cần nói nhiều,\nChỉ cần bên nhau.",
+    meaning: "Sự hiện diện quan trọng hơn lời nói."
+  }
+],
+41: [
+  {
+    topic: "Tiền tài",
+    poem: "Tiền đến chậm nhưng đều,\nLà phúc hơn đến nhanh rồi mất.",
+    meaning: "Tài chính của bạn đang đi theo hướng ổn định. Đừng nóng vội."
+  },
+  {
+    topic: "Tiền tài",
+    poem: "Biết quý từng đồng,\nLà đang quý chính mình.",
+    meaning: "Bạn đang học cách trân trọng công sức bản thân."
+  }
+],
+
+42: [
+  {
+    topic: "Công việc",
+    poem: "Chẳng ai biết hết mọi điều,\nChỉ ai chịu học là hơn.",
+    meaning: "Bạn sẽ tiến bộ nhanh nếu giữ tinh thần cầu tiến."
+  },
+  {
+    topic: "Công việc",
+    poem: "Không cần hơn ai,\nChỉ cần hơn mình hôm qua.",
+    meaning: "So sánh ít lại, tập trung vào bản thân nhiều hơn."
+  }
+],
+
+43: [
+  {
+    topic: "Sức khỏe",
+    poem: "Một ngày không mệt,\nLà một ngày đáng quý.",
+    meaning: "Bạn nên nghỉ ngơi đúng lúc, đừng cố quá."
+  },
+  {
+    topic: "Sức khỏe",
+    poem: "Nghe cơ thể mình nói,\nLà một dạng yêu thương.",
+    meaning: "Hãy chú ý tới những tín hiệu nhỏ từ cơ thể."
+  }
+],
+
+44: [
+  {
+    topic: "Học vấn",
+    poem: "Học không chỉ để biết,\nMà để hiểu mình hơn.",
+    meaning: "Bạn sẽ tìm thấy hướng đi phù hợp hơn cho bản thân."
+  },
+  {
+    topic: "Học vấn",
+    poem: "Chậm mà chắc,\nCòn hơn nhanh mà nản.",
+    meaning: "Bạn đang đi đúng hướng rồi."
+  }
+],
+
+45: [
+  {
+    topic: "Tình duyên",
+    poem: "Có người thương ta vì ta là ta,\nKhông cần cố gồng lên.",
+    meaning: "Bạn sẽ gặp người khiến bạn thấy nhẹ lòng."
+  },
+  {
+    topic: "Tình duyên",
+    poem: "Yêu không cần chứng minh,\nChỉ cần ở lại.",
+    meaning: "Sự hiện diện quan trọng hơn lời nói."
+  }
+],
+
+46: [
+  {
+    topic: "Gia đình",
+    poem: "Nhà là nơi,\nChẳng cần phải mạnh mẽ.",
+    meaning: "Bạn có thể yếu đuối khi ở bên gia đình."
+  },
+  {
+    topic: "Gia đình",
+    poem: "Về nhà rồi,\nLòng tự nhiên nhẹ.",
+    meaning: "Gia đình giúp bạn cân bằng lại tinh thần."
+  }
+],
+
+47: [
+  {
+    topic: "Tiền tài",
+    poem: "Biết đủ là đủ,\nKhông cần so nhiều.",
+    meaning: "Bạn đang học cách hài lòng với những gì mình có."
+  },
+  {
+    topic: "Tiền tài",
+    poem: "Tiền là công cụ,\nKhông phải thước đo.",
+    meaning: "Đừng để áp lực tài chính làm bạn mất vui."
+  }
+],
+
+48: [
+  {
+    topic: "Công việc",
+    poem: "Một lần thử,\nMở ra trăm ngã rẽ.",
+    meaning: "Bạn sắp có cơ hội mới, đừng ngại thử."
+  },
+  {
+    topic: "Công việc",
+    poem: "Sai không sao,\nKhông dám mới uổng.",
+    meaning: "Bạn có quyền thử và sai."
+  }
+],
+
+49: [
+  {
+    topic: "Sức khỏe",
+    poem: "Ngủ đủ một giấc,\nĐời cũng dễ thương hơn.",
+    meaning: "Giấc ngủ sẽ giúp bạn hồi phục nhiều thứ."
+  },
+  {
+    topic: "Sức khỏe",
+    poem: "Bình an từ trong tâm,\nLan ra ngoài thân.",
+    meaning: "Tinh thần tốt sẽ giúp cơ thể khỏe."
+  }
+],
+
+50: [
+  {
+    topic: "Học vấn",
+    poem: "Học không phải để hơn,\nMà để hiểu.",
+    meaning: "Bạn đang dần học vì bản thân, không phải vì áp lực."
+  },
+  {
+    topic: "Học vấn",
+    poem: "Mỗi ngày một chút,\nCũng là tiến lên.",
+    meaning: "Đừng coi thường những bước nhỏ."
+  }
+],
+
+    };
+
+    function drawFortune() {
+      const num = document.getElementById('numberInput').value;
+      const resultDiv = document.getElementById('result');
+
+      if (!num || num < 1 || num > 50 || !fortunes[num]) {
+        resultDiv.innerHTML = `<div class="result">Vui lòng nhập số từ 1 đến 50 hợp lệ nha 💛</div>`;
+        return;
+      }
+
+      const options = fortunes[num];
+      const randomIndex = Math.floor(Math.random() * options.length);
+      const fortune = options[randomIndex];
+
+      resultDiv.innerHTML = `
+        <div class="result">
+          <div class="topic">${fortune.topic}</div>
+          <div class="poem">${fortune.poem}</div>
+          <div class="meaning">${fortune.meaning}</div>
+        </div>
+      `;
+    }
+  </script>
+</body>
+</html>
